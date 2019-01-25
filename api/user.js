@@ -134,6 +134,10 @@ module.exports = app => {
             notExistsOrError(articles, 'Usuário possui artigos.')
             */
 
+           const subEmployee = await app.db('employees')
+            .where({ user_id: req.params.id })
+            notExistsOrError(subEmployee, 'Existe Funcionários cadastrados neste Usuário.')
+
             const rowsUpdated = await app.db('users')
                 .update({blocked: 1})
                 .where({ id: req.params.id })

@@ -57,25 +57,29 @@ module.exports = app => {
         .get(app.api.article.getByCategory)
 
 
-    // Grupo Item
-    app.route('/grupoitems')
+    // Group Items
+    app.route('/groupitems')
         .all(app.config.passport.authenticate())
-        .get(admin(app.api.grupoItem.get))
-        .post(admin(app.api.grupoItem.save))
+        .get(app.api.groupitem.get)
+        .post(admin(app.api.groupitem.save))
 
-    app.route('/grupoitems/tree')
+    app.route('/groupitems/:id')
         .all(app.config.passport.authenticate())
-        .get(app.api.grupoItem.getTree)
+        .get(app.api.groupitem.getById)
+        .put(admin(app.api.groupitem.save))
+        .delete(admin(app.api.groupitem.remove))    
 
-    app.route('/grupoitems/analit')
-        .all(app.config.passport.authenticate())
-        .get(app.api.grupoItem.getAnalit)    
+    // Unit Measures
+    app.route('/unitmeasures')
+      .all(app.config.passport.authenticate())
+      .get(app.api.unitmeasure.get)
+      .post(admin(app.api.unitmeasure.save))
 
-    app.route('/grupoitems/:id')
-        .all(app.config.passport.authenticate())
-        .get(app.api.grupoItem.getById)
-        .put(admin(app.api.grupoItem.save))
-        .delete(admin(app.api.grupoItem.remove))    
+    app.route('/unitmeasures/:id')
+      .all(app.config.passport.authenticate())
+      .get(app.api.unitmeasure.getById)
+      .put(admin(app.api.unitmeasure.save))
+      .delete(admin(app.api.unitmeasure.remove))        
 
     // Companys    
 
@@ -130,7 +134,7 @@ module.exports = app => {
        .put(admin(app.api.planoconta.save))
        .delete(admin(app.api.planoconta.remove))       
 
-       // Items    
+    // Items    
 
     app.route('/items')
        .all(app.config.passport.authenticate())
@@ -142,6 +146,10 @@ module.exports = app => {
        .get(app.api.item.getById)
        .put(admin(app.api.item.save))
        .delete(admin(app.api.item.remove))      
+
+    app.route('/groupitems/:id/items')
+       .all(app.config.passport.authenticate())
+       .get(app.api.item.getByGroupItem)
 
       // Vendedor 
 

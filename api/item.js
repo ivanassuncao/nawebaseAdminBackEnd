@@ -1,17 +1,25 @@
-const queries = require('./queries')
-
 module.exports = app => {
     const { existsOrError } = app.api.validation
 
     const save = (req, res) => {
-        const item = { ...req.body }
+        const item = {  
+            id: req.body.id,
+            name: req.body.name,
+            description: req.body.description,
+            internal_code: req.body.internal_code,
+            ncm: req.body.ncm,
+            cest: req.body.cest,
+            group_item_id: req.body.group_item_id,
+            unit_measure_id: req.body.unit_measure_id,
+            stock: req.body.stock,
+            blocked: req.body.blocked,
+            photo: req.body.photo
+         }
 
         if(req.params.id) item.id = req.params.id
 
         try {
-            existsOrError(item.descricaoItem, 'Descrição não informada')
-            existsOrError(item.detalhamentoItem, 'Detalhamento não informada')
-            existsOrError(item.grupoItemId, 'Grupo do Item não informada')
+            existsOrError(item.name, 'Nome não informado...')
         } catch(msg) {
             res.status(400).send(msg)
         }
@@ -35,14 +43,10 @@ module.exports = app => {
     const remove = async (req, res) => {
         try {
             const rowsDeleted = await app.db('items')
-                .where({ id: req.params.id }).del()
-
-            const subitem = await app.db('items')
-                .where({ parentId: req.params.id })
-            notExistsOrError(subitem, 'Item Base possui subItems.')                
+                .where({ id: req.params.id }).del()           
             
             try {
-                existsOrError(rowsDeleted, 'Items não foi encontrada.')
+                existsOrError(rowsDeleted, 'Item não foi encontrado.')
             } catch(msg) {
                 return res.status(400).send(msg)    
             }
@@ -67,13 +71,15 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
     }
 
-    const getItemBase = (req, res) => {
+    const getByGroupItem = async (req, res) => {
+
         app.db('items')
+            .where({group_item_id: req.params.id})
+            .orderBy('name')
             .then(items => res.json(items))
-            .where({itemBase: true})
             .catch(err => res.status(500).send(err))
     }
 
-    return { save, remove, get, getById, getItemBase}
+    return { save, remove, get, getById,getByGroupItem}
 
 }
