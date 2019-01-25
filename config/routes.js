@@ -9,8 +9,8 @@ module.exports = app => {
     app.put('/passwordChange/:id',app.api.user.passwordChange)
     app.get('/states',app.api.util.getStates)
     app.get('/citys/:id',app.api.util.getCitys)
-    app.put('/blocked/:id',admin(app.api.user.blocked))
-    app.put('/unBlocked/:id',admin(app.api.user.unBlocked))
+    app.put('/blocked/:id',app.api.user.blocked)
+    app.put('/unBlocked/:id',app.api.user.unBlocked)
 
     app.route('/users')
         .all(app.config.passport.authenticate())
@@ -89,6 +89,33 @@ module.exports = app => {
         .get(app.api.company.getById)
         .put(admin(app.api.company.save))
         .delete(admin(app.api.company.remove))  
+
+    // Employees    
+
+       app.route('/employees')
+       .all(app.config.passport.authenticate())
+       .get(app.api.employee.get)
+       .post(admin(app.api.employee.save))
+
+   app.route('/employees/:id')
+       .all(app.config.passport.authenticate())
+       .get(app.api.employee.getById)
+       .put(admin(app.api.employee.save))
+       .delete(admin(app.api.employee.remove))      
+
+    // Office
+
+    app.route('/offices')
+        .all(app.config.passport.authenticate())
+        .get(app.api.office.get)
+        .post(admin(app.api.office.save))
+
+    app.route('/offices/:id')
+        .all(app.config.passport.authenticate())
+        .get(app.api.office.getById)
+        .put(admin(app.api.office.save))
+        .delete(admin(app.api.office.remove))  
+
 
     // Plano de Contas    
 

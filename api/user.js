@@ -12,9 +12,6 @@ module.exports = app => {
         const user = { ...req.body }
         if(req.params.id) user.id = req.params.id
 
-        if(!req.originalUrl.startsWith('/users')) user.admin = false
-        if(!req.user || !req.user.admin) user.admin = false
-
         try {
 
             existsOrError(user.password, 'Senha não informada')
@@ -38,6 +35,39 @@ module.exports = app => {
         } 
     }
 
+    const blocked = async(req,res)=>{
+        const user = { ...req.body }
+        if(req.params.id) user.id = req.params.id
+
+        if(!req.originalUrl.startsWith('/users')) user.admin = false
+        if(!req.user || !req.user.admin) user.admin = false
+
+        if(user.id) {
+            app.db('users')
+                .update({blocked: 1})
+                .where({ id: user.id })
+                .then(_ => res.status(204).send())
+                .catch(err => res.status(500).send(err))
+        } 
+    }
+
+    
+    const unBlocked = async(req,res)=>{
+        const user = { ...req.body }
+        if(req.params.id) user.id = req.params.id
+
+        if(!req.originalUrl.startsWith('/users')) user.admin = false
+        if(!req.user || !req.user.admin) user.admin = false
+
+        if(user.id) {
+            app.db('users')
+                .update({blocked: 0})
+                .where({ id: user.id })
+                .then(_ => res.status(204).send())
+                .catch(err => res.status(500).send(err))
+        } 
+    }
+
     const save = async (req, res) => {
         const user = { ...req.body }
         if(req.params.id) user.id = req.params.id
@@ -50,8 +80,7 @@ module.exports = app => {
             existsOrError(user.email, 'E-mail não informado')
           //  existsOrError(user.password, 'Senha não informada')
           //  existsOrError(user.confirmPassword, 'Confirmação de Senha inválida')
-            equalsOrError(user.password, user.confirmPassword,
-                'Senhas não conferem')
+            equalsOrError(user.password, user.confirmPassword,'Senhas não conferem')
 
             const userFromDB = await app.db('users')
                 .where({ email: user.email }).first()
@@ -62,9 +91,7 @@ module.exports = app => {
             return res.status(400).send(msg)
         }
 
-        user.password = encryptPassword(user.password)
-        delete user.confirmPassword
-
+       
         if(user.id) {
             app.db('users')
                 .update(user)
@@ -72,6 +99,10 @@ module.exports = app => {
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
+            
+            user.password = encryptPassword(user.password)
+            delete user.confirmPassword
+    
             app.db('users')
                 .insert(user)
                 .then(_ => res.status(204).send())
@@ -81,14 +112,14 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db('users')
-            .select('id', 'name', 'email', 'admin','super','photo')
+            .select('id', 'name', 'email', 'admin','super','photo','blocked')
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
     }
 
     const getById = (req, res) => {
         app.db('users')
-            .select('id', 'name', 'email', 'admin','super','photo')
+            .select('id', 'name', 'email', 'admin','super','photo','blocked')
             .where({id: req.params.id})
             .first()
             .then(user => res.json(user))
@@ -114,5 +145,5 @@ module.exports = app => {
         }
     }
 
-    return { save, get, getById, remove,passwordChange }
+    return { save, get, getById, remove, passwordChange, blocked, unBlocked }
 }

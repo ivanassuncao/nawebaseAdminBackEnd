@@ -23,7 +23,7 @@ module.exports = app => {
             state_id: req.body.state_id,
             telephone: req.body.telephone,
             blocked: req.body.blocked,
-            photo: req.body.photo,
+            photo: req.body.photo
          }
 
         if(req.params.id) company.id = req.params.id
